@@ -99,12 +99,14 @@ Target 1
 <br>Navigate to /var/www/http/wordpress
 <br> `cat/nano/less wp-config.php`
 
+Port 80 is unsecured (HTTP) and finding it as a Wordpress Site created an opportunity for exploit. Additionally, Port 22 is also open so SSH services are accessable. 
 
-Include vulnerability scan results to prove the identified vulnerabilities.
 ## Exploitation
 
 The Red Team was able to penetrate Target 1 and retrieve the following confidential data:
 Target 1
+### Flag 1
+Found in service.html:
 
 Flag1.txt:
 flag1{b9bbcb33e11b80be759c4e844862482d}
@@ -122,7 +124,14 @@ Found in the www directory
 
 Flag3.txt
 flag3{afc01ab56b50591e7dccf93122770cd2}
+```
+michael@target1:~$ mysql -u root -p
 
+mysql> show databases;
+mysql> use wordpress;
+mysql> show tables;
+mysql> select * from wp_posts;
+```
 Found in the mySQL command: wordpress database in the wp_posts table
 ### Flag 4 Exploit Used
 
@@ -135,13 +144,13 @@ This reverse shells from steven user to root privilege
 Using cd: it took me to the root home folder and flag4.txt was in there
 
 
-# Blue Team
-## Blue Team: Summary of Operations
-### Table of Contents
-#### Network Topology
-#### Description of Targets
-#### Monitoring the Targets
-#### Patterns of Traffic & Behavior
+
+# Blue Team: Summary of Operations
+## Table of Contents
+### Network Topology
+### Description of Targets
+### Monitoring the Targets
+### Patterns of Traffic & Behavior
 
 ## Network Topology
 The following machines were identified on the network:
@@ -191,3 +200,27 @@ Metric: Metricbeat: CPU process power
 Threshold: Over 0.5%
 Vulnerability Mitigated: Mitigates excessive task power which might seem abnormal to regular functions.
 Reliability: High: most of the pings were of less than .3% of cpu utilization. 
+
+# Network Analysis: Summary of Operations
+## Case: Time Thieves
+### Setup: At least two users on the network have been wasting time on YouTube. Usually, IT wouldn't pay much mind to this behavior, but it seems these people have created their own web server on the corporate network. So far, Security knows the following about these time thieves: They have set up an Active Directory network. They are constantly watching videos on YouTube. Their IP addresses are somewhere in the range 10.6.12.0/24.
+
+### You must inspect your traffic capture to answer the following questions:
+
+#### Using Wireshark and creating a 15 minute scan of the network, I was able to derive the following:
+
+*What is the domain name of the users' custom site?*
+
+10.6.12.157(DESKTOP-86J4BX IP address) > 10.6.12.12 (DC IP Address): frank-n-ted.com
+
+*What is the IP address of the Domain Controller (DC) of the AD network?*
+
+From “Frank-n-Ted-DC.frank-n-ted.com”: The IP Address is 10.6.12.12
+
+*What is the name of the malware downloaded to the 10.6.12.203 machine? Once you have found the file, export it to your Kali machine's desktop.*
+
+There is a file that was uploaded called june11.dll that is concerning. dlls are libraries that contain code that can be executed and given that this one was downloaded by a malicious actor and one of only a few items downloaded, it was investigated.
+
+*Upload the file to VirusTotal.com. What kind of malware is this classified as?*
+
+The Malware is considered a Trojan Spy from many of the detection sites. 
